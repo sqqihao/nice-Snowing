@@ -5,17 +5,37 @@
 		$timeout = setTimeout;
 		
 	window.Snow = function(element, settings) {
+        (function() {
+            var lastTime = 0;
+            var vendors = ['webkit', 'moz'];
+            for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+                window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+                window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||    // name has changed in Webkit
+                    window[vendors[x] + 'CancelRequestAnimationFrame'];
+            }
+
+            if (!window.requestAnimationFrame) {
+                window.requestAnimationFrame = function(callback, element) {
+                    var currTime = new Date().getTime();
+                    var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
+                    var id = window.setTimeout(function() {
+                        callback(currTime + timeToCall);
+                    }, timeToCall);
+                    lastTime = currTime + timeToCall;
+                    return id;
+                };
+            }
+            if (!window.cancelAnimationFrame) {
+                window.cancelAnimationFrame = function(id) {
+                    clearTimeout(id);
+                };
+            }
+        }());
 		this.settings = settings, 
 		this.flakes = [], 
 		this.flakeCount = settings.count, 
 		this.mx = -100, 
 		this.my = -100,
-		function() {
-			var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
-				$timeout(callback, 1e3 / 60)
-			};
-			$window.requestAnimationFrame = requestAnimationFrame
-		}(), 
 		this.init(element)
 	};
 	Snow.prototype.init = function(element) {
@@ -47,7 +67,7 @@
 			thiz.ctx.clearRect(0, 0, thiz.canvas.width, thiz.canvas.height), thiz.canvas.width = $window.innerWidth, thiz.canvas.height = $window.innerHeight
 		});
 		if(typeof this.settings.image === "string") {
-			this.image = $("<img src='imgs/" + this.settings.image + "' style='display: none'>");
+			this.image = $("<img src='" + this.settings.image + "' style='display: none'>");
 		};
 		
 		this.snow();
@@ -112,7 +132,7 @@
 		$(this).each(function(i, e) {
 			var scope = {};
 			$.each(e.attributes,function(index, key) {
-				scope[ $.camelCase(key.name) ] = Number.isFinite( Number(key.value) ) ? Number(key.value) : key.value
+				scope[ $.camelCase(key.name) ] = Number( Number(key.value) ) ? Number(key.value) : key.value
 			});
 			if ( typeof scope.image === "string" && scope.image === "false" ) {scope.image = false};
 			
