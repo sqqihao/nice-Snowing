@@ -21,6 +21,6 @@ javascirpt like that :
 ```
 $(".snow-canvas").snow();
 ```
-in the ie6; i use <img> to replace canvas ;
+in the ie6; i use &gt;img&lt; to replace canvas ;
 
 3Q for you advise    \。__。/
