@@ -21,11 +21,18 @@
             if (!window.requestAnimationFrame) {
                 window.requestAnimationFrame = function (callback, element) {
                     var currTime = new Date().getTime();
+                    /*
                     var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
                     var id = window.setTimeout(function () {
                         callback(currTime + timeToCall);
                     }, timeToCall);
                     lastTime = currTime + timeToCall;
+                    */
+                    var timeToCall = 14; //to slow in safari, so i changed to 16.7;
+                    var id = window.setTimeout(function () {
+                        callback(timeToCall);
+                    }, timeToCall);
+
                     return id;
                 };
             }
